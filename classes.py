@@ -21,6 +21,7 @@ class Title:
         self.heading = a.text.strip()
         self.url = root_url + a.attrib["href"]
         self.name = node.xpath("//tr/td")[2].text.strip() # gets the heading from the third cell in the row
+        print(self.name)
 
         # load page and traverse chapters
         page = requests.get(self.url)
@@ -43,14 +44,17 @@ class Chapter:
         self.heading = a.text.strip()
         self.url = root_url + a.attrib["href"]
         self.name = node.xpath("//tr/td")[2].text.strip() # gets the heading from the third cell in the row
+        print(".."+self.name)
 
         # load page and traverse sections
         page = requests.get(self.url)
         tree = html.fromstring(page.content)
         self.sections = list()
-        for html_node in tree.xpath("//tr/td/a/../.."): # grabs the table rows for all <a> tags
+        # for html_node in tree.xpath("//tr/td/a/../.."): # grabs the table rows for all <a> tags
+        for html_node in tree.xpath("//tr/td/a[contains(text(),'-')]/../.."): # grabs the table rows for all <a> tags containing the word CHAPTER
             # THIS DOESN'T ACCOUNT FOR REPEALED SECTIONS. NEED TO ADD
             # (MAYBE SWITCH TO SELECTING td DIRECTLY AND THEN SEARCHING FOR a IF IT'S THERE?)
+
             section = etree.ElementTree(html_node)
             self.sections.append(Section(section))
 
@@ -65,6 +69,7 @@ class Section:
         self.heading = a.text.strip()
         self.url = root_url + a.attrib["href"]
         self.name = node.xpath("//tr/td")[2].text.strip() # gets the heading from the third cell in the row
+        print("...."+self.name)
 
         # load page and traverse sections
         self.subsections = list()
