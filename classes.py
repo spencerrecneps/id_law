@@ -72,4 +72,12 @@ class Section:
         print("...."+self.name)
 
         # load page and traverse sections
-        self.subsections = list()
+        page = requests.get(self.url)
+        tree = html.fromstring(page.content)
+        self.number = tree.xpath("//div[not(contains(@style,'text-align: center'))]/span[contains(@class, 'f11s')]")[0].text.strip() # gets the full section number
+        self.history = tree.xpath("//div[not(contains(@style,'text-align: center'))]/span[contains(@class, 'f11s')]")[1].text.strip() # gets the history
+        self.paragraphs = list()
+        for part in tree.xpath("//div[not(contains(@style,'text-align: center'))]/span[contains(@class, 'f11s')]")[0]: # grabs the table rows for all <a> tags containing the word CHAPTER
+            self.paragraphs.append((part.text.strip(),part.tail.strip()))
+            # we're choking here
+            # https://legislature.idaho.gov/statutesrules/idstat/Title1/T1CH20/SECT1-2001/
